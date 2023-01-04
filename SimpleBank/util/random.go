@@ -41,3 +41,6 @@ func RandomCurrency() string {
 	n := len(currencies)
 	return currencies[rand.Intn(n)]
 }
+
+// accaunts_id,
+// amount
