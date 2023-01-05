@@ -54,18 +54,20 @@ func (q *Queries) GetEnteries(ctx context.Context, id int64) (Enteries, error) {
 
 const listEnteriess = `-- name: ListEnteriess :many
 SELECT id, accaunts_id, amount, created_at FROM enteries
+WHERE accaunts_id=$1
 ORDER BY id
-LIMIT $1
-OFFSET $2
+LIMIT $2
+OFFSET $3
 `
 
 type ListEnteriessParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	AccauntsID int64 `json:"accaunts_id"`
+	Limit      int32 `json:"limit"`
+	Offset     int32 `json:"offset"`
 }
 
 func (q *Queries) ListEnteriess(ctx context.Context, arg ListEnteriessParams) ([]Enteries, error) {
-	rows, err := q.db.QueryContext(ctx, listEnteriess, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listEnteriess, arg.AccauntsID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

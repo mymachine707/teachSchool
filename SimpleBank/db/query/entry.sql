@@ -12,6 +12,7 @@ WHERE id =$1 LIMIT 1;
 
 -- name: ListEnteriess :many
 SELECT * FROM enteries
+WHERE accaunts_id=$1
 ORDER BY id
-LIMIT $1
-OFFSET $2;
+LIMIT $2
+OFFSET $3;
