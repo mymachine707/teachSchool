@@ -38,15 +38,6 @@ func (q *Queries) CreateTransfers(ctx context.Context, arg CreateTransfersParams
 	return i, err
 }
 
-const deleteTransfers = `-- name: DeleteTransfers :exec
-DELETE FROM transfers WHERE id =$1
-`
-
-func (q *Queries) DeleteTransfers(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteTransfers, id)
-	return err
-}
-
 const getTransfers = `-- name: GetTransfers :one
 SELECT id, from_accaunts_id, to_accaunts_id, amount, created_at FROM transfers
 WHERE id =$1 LIMIT 1
@@ -67,18 +58,28 @@ func (q *Queries) GetTransfers(ctx context.Context, id int64) (Transfers, error)
 
 const listTransfers = `-- name: ListTransfers :many
 SELECT id, from_accaunts_id, to_accaunts_id, amount, created_at FROM transfers
+WHERE
+    from_accaunts_id = $1 OR
+    to_accaunts_id = $2
 ORDER BY id
-LIMIT $1
-OFFSET $2
+LIMIT $3
+OFFSET $4
 `
 
 type ListTransfersParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	FromAccauntsID int64 `json:"from_accaunts_id"`
+	ToAccauntsID   int64 `json:"to_accaunts_id"`
+	Limit          int32 `json:"limit"`
+	Offset         int32 `json:"offset"`
 }
 
 func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfers, error) {
-	rows, err := q.db.QueryContext(ctx, listTransfers, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listTransfers,
+		arg.FromAccauntsID,
+		arg.ToAccauntsID,
+		arg.Limit,
+		arg.Offset,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -104,29 +105,4 @@ func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateTransfers = `-- name: UpdateTransfers :one
-UPDATE transfers
-SET amount= $2
-WHERE id= $1
-RETURNING id, from_accaunts_id, to_accaunts_id, amount, created_at
-`
-
-type UpdateTransfersParams struct {
-	ID     int64 `json:"id"`
-	Amount int64 `json:"amount"`
-}
-
-func (q *Queries) UpdateTransfers(ctx context.Context, arg UpdateTransfersParams) (Transfers, error) {
-	row := q.db.QueryRowContext(ctx, updateTransfers, arg.ID, arg.Amount)
-	var i Transfers
-	err := row.Scan(
-		&i.ID,
-		&i.FromAccauntsID,
-		&i.ToAccauntsID,
-		&i.Amount,
-		&i.CreatedAt,
-	)
-	return i, err
 }
