@@ -15,12 +15,3 @@ SELECT * FROM enteries
 ORDER BY id
 LIMIT $1
 OFFSET $2;
-
--- name: UpdateEnteries :one
-UPDATE enteries
-SET amount= $2
-WHERE id= $1
-RETURNING *;
-
--- name: DeleteEnteries :exec
-DELETE FROM enteries WHERE id =$1;

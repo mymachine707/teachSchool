@@ -35,15 +35,6 @@ func (q *Queries) CreateEnteries(ctx context.Context, arg CreateEnteriesParams) 
 	return i, err
 }
 
-const deleteEnteries = `-- name: DeleteEnteries :exec
-DELETE FROM enteries WHERE id =$1
-`
-
-func (q *Queries) DeleteEnteries(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteEnteries, id)
-	return err
-}
-
 const getEnteries = `-- name: GetEnteries :one
 SELECT id, accaunts_id, amount, created_at FROM enteries
 WHERE id =$1 LIMIT 1
@@ -99,28 +90,4 @@ func (q *Queries) ListEnteriess(ctx context.Context, arg ListEnteriessParams) ([
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateEnteries = `-- name: UpdateEnteries :one
-UPDATE enteries
-SET amount= $2
-WHERE id= $1
-RETURNING id, accaunts_id, amount, created_at
-`
-
-type UpdateEnteriesParams struct {
-	ID     int64 `json:"id"`
-	Amount int64 `json:"amount"`
-}
-
-func (q *Queries) UpdateEnteries(ctx context.Context, arg UpdateEnteriesParams) (Enteries, error) {
-	row := q.db.QueryRowContext(ctx, updateEnteries, arg.ID, arg.Amount)
-	var i Enteries
-	err := row.Scan(
-		&i.ID,
-		&i.AccauntsID,
-		&i.Amount,
-		&i.CreatedAt,
-	)
-	return i, err
 }
