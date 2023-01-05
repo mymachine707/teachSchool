@@ -11,6 +11,12 @@ INSERT INTO accaunts (
 SELECT * FROM accaunts
 WHERE id =$1 LIMIT 1;
 
+-- name: GetAccountForUpdate :one
+SELECT * FROM accaunts
+WHERE id =$1 LIMIT 1
+FOR NO KEY UPDATE;
+
+
 -- name: ListAccounts :many
 SELECT * FROM accaunts
 ORDER BY id
