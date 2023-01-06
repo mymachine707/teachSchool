@@ -19,4 +19,7 @@ sqlc:
 test:
 	go test -v -cover ./...
 
+mysql:
+	docker run --name mysql -p 3306:3306 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=5197534i@ -d postgres:12-alpine 
+
 .PHONY: postgres createdb drobdb migrateup migratedown sqlc test
