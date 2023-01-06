@@ -1,0 +1,3 @@
+[submodule "SimpleBank"]
+	path = SimpleBank
+	url = https://github.com/mymachine707/SimpleBank.git
